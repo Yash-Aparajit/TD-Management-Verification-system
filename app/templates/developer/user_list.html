@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<h2>Users</h2>
+<p><a class="btn btn-primary" href="{{ url_for('developer.user_create') }}">Create user</a></p>
+<table class="table table-striped">
+  <thead><tr><th>Username</th><th>Full name</th><th>Role</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{{ u.full_name }}</td>
+      <td>{{ u.role }}</td>
+      <td>{% if u.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+      <td>
+        {% if u.id != current_user.id %}
+          {% if u.is_active %}
+            <form method="post" action="{{ url_for('developer.user_deactivate', user_id=u.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-link btn-sm text-danger">Deactivate</button></form>
+          {% else %}
+            <form method="post" action="{{ url_for('developer.user_activate', user_id=u.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-link btn-sm">Activate</button></form>
+          {% endif %}
+          | <a href="{{ url_for('developer.force_reset_password', user_id=u.id) }}">Force password reset</a>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
