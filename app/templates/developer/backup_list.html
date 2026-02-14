@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Backup / Restore{% endblock %}
+{% block content %}
+<h2>Backup / Restore</h2>
+<p><a class="btn btn-primary" href="{{ url_for('developer.backup_create') }}">Create backup now</a></p>
+<p class="text-muted">Backups older than 30 days are automatically deleted.</p>
+<table class="table table-striped">
+  <thead><tr><th>File</th><th>Created</th><th></th></tr></thead>
+  <tbody>
+  {% for name, path, mtime in backups %}
+    <tr>
+      <td>{{ name }}</td>
+      <td>{{ mtime.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td><a href="{{ url_for('developer.backup_download', filename=name) }}">Download</a> | <a href="{{ url_for('developer.backup_restore') }}">Restore (choose file on next page)</a></td>
+    </tr>
+  {% else %}
+    <tr><td colspan="3">No backups yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<h3>Restore database</h3>
+<p><a class="btn btn-danger" href="{{ url_for('developer.backup_restore') }}">Go to restore (double confirmation required)</a></p>
+<p class="text-warning">Restore will enable maintenance mode, log out all users, and replace the database. This is destructive and logged.</p>
+{% endblock %}
