@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if line else 'New' }} line{% endblock %}
+{% block content %}
+<h2>{{ 'Edit' if line else 'New' }} line</h2>
+<form method="post" action="{{ url_for('admin.line_edit', line_id=line.id) if line else url_for('admin.line_create') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="mb-3"><label class="form-label">Code</label><input type="text" name="code" class="form-control" value="{{ line.code if line else '' }}" required></div>
+  <div class="mb-3"><label class="form-label">Name</label><input type="text" name="name" class="form-control" value="{{ line.name if line else '' }}"></div>
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="{{ url_for('admin.lines_list') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
