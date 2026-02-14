@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}TD items – {{ fg.code }}{% endblock %}
+{% block content %}
+<h2>TD items – {{ fg.code }}</h2>
+<p class="text-muted">{{ fg.line.code if fg.line else '' }} / {{ fg.name or fg.code }}</p>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-auto"><input type="text" name="q" class="form-control" placeholder="Search code/name" value="{{ request.args.get('q','') }}"></div>
+  <div class="col-auto"><select name="type" class="form-select"><option value="">All types</option><option value="child_part" {% if request.args.get('type')=='child_part' %}selected{% endif %}>Child part</option><option value="consumable" {% if request.args.get('type')=='consumable' %}selected{% endif %}>Consumable</option></select></div>
+  <div class="col-auto"><button type="submit" class="btn btn-secondary">Filter</button></div>
+  <div class="col-auto"><a class="btn btn-primary" href="{{ url_for('admin.td_create', fg_id=fg.id) }}">Add TD item</a></div>
+  <div class="col-auto"><a class="btn btn-outline-success" href="{{ url_for('admin.export_td', fg_id=fg.id) }}">Export Excel</a></div>
+</form>
+<table class="table table-striped">
+  <thead><tr><th>Item code</th><th>Item name</th><th>Type</th><th>Qty</th><th>Unit</th><th>Updated</th><th></th></tr></thead>
+  <tbody>
+  {% for it in pagination.items %}
+    <tr>
+      <td>{{ it.item_code }}</td>
+      <td>{{ it.item_name }}</td>
+      <td>{{ it.item_type }}</td>
+      <td>{{ it.quantity }}</td>
+      <td>{{ it.unit }}</td>
+      <td>{{ it.updated_at.strftime('%Y-%m-%d %H:%M') if it.updated_at else '-' }} {% if it.updated_by %}({{ it.updated_by.username }}){% endif %}</td>
+      <td>
+        <a href="{{ url_for('admin.td_edit', fg_id=fg.id, item_id=it.id) }}">Edit</a>
+        {% if it.is_active %}
+          <form method="post" action="{{ url_for('admin.td_deactivate', fg_id=fg.id, item_id=it.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-link btn-sm text-danger">Deactivate</button></form>
+        {% else %}
+          <form method="post" action="{{ url_for('admin.td_activate', fg_id=fg.id, item_id=it.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-link btn-sm">Activate</button></form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if pagination.pages > 1 %}
+<nav><ul class="pagination">{% for p in pagination.iter_pages() %}<li class="page-item {% if p == pagination.page %}active{% endif %}"><a class="page-link" href="{{ url_for('admin.td_list', fg_id=fg.id, page=p, q=request.args.get('q'), type=request.args.get('type')) }}">{{ p or '…' }}</a></li>{% endfor %}</ul></nav>
+{% endif %}
+<p><a href="{{ url_for('admin.fg_list') }}">Back to FG codes</a></p>
+{% endblock %}
