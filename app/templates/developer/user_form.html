@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Create user{% endblock %}
+{% block content %}
+<h2>Create user</h2>
+<form method="post" action="{{ url_for('developer.user_create') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="mb-3"><label class="form-label">Username</label><input type="text" name="username" class="form-control" required></div>
+  <div class="mb-3"><label class="form-label">Full name</label><input type="text" name="full_name" class="form-control"></div>
+  <div class="mb-3"><label class="form-label">Role</label><select name="role" class="form-select"><option value="operator">Operator</option><option value="admin">Admin</option><option value="developer">Developer</option></select></div>
+  <div class="mb-3"><label class="form-label">Password</label><input type="password" name="password" class="form-control" required minlength="10"><small class="text-muted">Min 10 chars, one number, one letter, one symbol. User must change on first login.</small></div>
+  <button type="submit" class="btn btn-primary">Create</button>
+  <a href="{{ url_for('developer.users_list') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
