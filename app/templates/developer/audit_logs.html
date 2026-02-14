@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Audit logs{% endblock %}
+{% block content %}
+<h2>Audit logs</h2>
+<table class="table table-striped table-sm">
+  <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Resource</th><th>Details</th><th>IP</th></tr></thead>
+  <tbody>
+  {% for log in pagination.items %}
+    <tr>
+      <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') if log.created_at else '-' }}</td>
+      <td>{{ log.username or '-' }}</td>
+      <td>{{ log.action }}</td>
+      <td>{{ log.resource or '-' }} {{ log.resource_id or '' }}</td>
+      <td>{{ log.details or '-' }}</td>
+      <td>{{ log.ip_address or '-' }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if pagination.pages > 1 %}
+<nav><ul class="pagination">{% for p in pagination.iter_pages() %}<li class="page-item {% if p == pagination.page %}active{% endif %}"><a class="page-link" href="{{ url_for('developer.audit_logs', page=p) }}">{{ p or '…' }}</a></li>{% endfor %}</ul></nav>
+{% endif %}
+{% endblock %}
