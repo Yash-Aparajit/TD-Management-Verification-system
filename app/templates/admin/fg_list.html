@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}FG codes{% endblock %}
+{% block content %}
+<h2>FG codes</h2>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-auto"><select name="line_id" class="form-select"><option value="">All lines</option>{% for l in lines %}<option value="{{ l.id }}" {% if request.args.get('line_id')|int == l.id %}selected{% endif %}>{{ l.code }}</option>{% endfor %}</select></div>
+  <div class="col-auto"><input type="text" name="q" class="form-control" placeholder="Search FG code" value="{{ request.args.get('q','') }}"></div>
+  <div class="col-auto"><button type="submit" class="btn btn-secondary">Filter</button></div>
+  <div class="col-auto"><a class="btn btn-primary" href="{{ url_for('admin.fg_create') }}">Add FG code</a></div>
+</form>
+<table class="table table-striped">
+  <thead><tr><th>Line</th><th>FG code</th><th>Name</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for fg in pagination.items %}
+    <tr>
+      <td>{{ fg.line.code if fg.line else '-' }}</td>
+      <td>{{ fg.code }}</td>
+      <td>{{ fg.name or '-' }}</td>
+      <td>{% if fg.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+      <td>
+        <a href="{{ url_for('admin.td_list', fg_id=fg.id) }}">TD items</a> |
+        <a href="{{ url_for('admin.fg_edit', fg_id=fg.id) }}">Edit</a>
+        {% if fg.is_active %}
+          <form method="post" action="{{ url_for('admin.fg_deactivate', fg_id=fg.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-link btn-sm text-danger">Deactivate</button></form>
+        {% else %}
+          <form method="post" action="{{ url_for('admin.fg_activate', fg_id=fg.id) }}" class="d-inline"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-link btn-sm">Activate</button></form>
+        {% endif %}
+        | <a href="{{ url_for('admin.export_td', fg_id=fg.id) }}">Export Excel</a>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if pagination.pages > 1 %}
+<nav><ul class="pagination">{% for p in pagination.iter_pages() %}<li class="page-item {% if p == pagination.page %}active{% endif %}"><a class="page-link" href="{{ url_for('admin.fg_list', page=p, line_id=request.args.get('line_id'), q=request.args.get('q')) }}">{{ p or '…' }}</a></li>{% endfor %}</ul></nav>
+{% endif %}
+{% endblock %}
