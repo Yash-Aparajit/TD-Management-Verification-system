@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Developer Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><i class="bi bi-speedometer2"></i> System Dashboard</h2>
+  <p class="text-muted mb-0">Monitor system health and manage administrative tasks</p>
+</div>
+
+<!-- System Status Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="stat-icon {% if db_ok %}text-success{% else %}text-danger{% endif %}">
+          <i class="bi {% if db_ok %}bi-database-check{% else %}bi-database-x{% endif %}"></i>
+        </div>
+        <div class="stat-value {% if db_ok %}text-success{% else %}text-danger{% endif %}">
+          {% if db_ok %}OK{% else %}Error{% endif %}
+        </div>
+        <div class="stat-label">Database</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="stat-icon {% if redis_ok %}text-success{% elif redis_available %}text-danger{% else %}text-info{% endif %}">
+          <i class="bi {% if redis_ok %}bi-server{% elif redis_available %}bi-server{% else %}bi-server{% endif %}"></i>
+        </div>
+        <div class="stat-value {% if redis_ok %}text-success{% elif redis_available %}text-danger{% else %}text-info{% endif %}">
+          {% if redis_ok %}OK{% elif redis_available %}Error{% else %}Not Required{% endif %}
+        </div>
+        <div class="stat-label">Redis</div>
+        {% if not redis_available %}<small class="text-muted d-block mt-1">Using filesystem sessions</small>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="stat-icon text-primary">
+          <i class="bi bi-people"></i>
+        </div>
+        <div class="stat-value text-primary">{{ active_sessions }}</div>
+        <div class="stat-label">Active Sessions</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="stat-icon {% if maintenance %}text-warning{% else %}text-success{% endif %}">
+          <i class="bi {% if maintenance %}bi-tools{% else %}bi-check-circle{% endif %}"></i>
+        </div>
+        <div class="stat-value {% if maintenance %}text-warning{% else %}text-success{% endif %}">
+          {% if maintenance %}On{% else %}Off{% endif %}
+        </div>
+        <div class="stat-label">Maintenance</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Statistics Row -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-people"></i> Users</h6>
+        <h3 class="mb-0">{{ active_users }} / {{ total_users }}</h3>
+        <small class="text-muted">Active / Total</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-diagram-3"></i> Lines</h6>
+        <h3 class="mb-0">{{ active_lines }} / {{ total_lines }}</h3>
+        <small class="text-muted">Active / Total</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-boxes"></i> FG Codes</h6>
+        <h3 class="mb-0">{{ active_fg_codes }} / {{ total_fg_codes }}</h3>
+        <small class="text-muted">Active / Total</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-list-check"></i> TD Items</h6>
+        <h3 class="mb-0">{{ total_td_items }}</h3>
+        <small class="text-muted">Total Items</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Quick Actions -->
+  <div class="col-md-6">
+    <div class="dashboard-section">
+      <h5><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+      <div class="list-group list-group-flush">
+        <div class="list-group-item">
+          <a href="{{ url_for('developer.users_list') }}"><i class="bi bi-people"></i> Manage Users</a>
+          <small class="text-muted d-block ms-4">Create, deactivate, force password reset</small>
+        </div>
+        <div class="list-group-item">
+          <a href="{{ url_for('developer.maintenance_page') }}"><i class="bi bi-tools"></i> Maintenance Mode</a>
+          <small class="text-muted d-block ms-4">Enable/disable system maintenance</small>
+        </div>
+        <div class="list-group-item">
+          <a href="{{ url_for('developer.backup_list') }}"><i class="bi bi-database"></i> Backup / Restore</a>
+          <small class="text-muted d-block ms-4">Create backups or restore database</small>
+        </div>
+        <div class="list-group-item">
+          <a href="{{ url_for('developer.audit_logs') }}"><i class="bi bi-journal-text"></i> Audit Logs</a>
+          <small class="text-muted d-block ms-4">View system activity logs</small>
+        </div>
+        <div class="list-group-item">
+          <a href="{{ url_for('developer.active_sessions') }}"><i class="bi bi-activity"></i> Active Sessions</a>
+          <small class="text-muted d-block ms-4">Monitor user sessions</small>
+        </div>
+        <div class="list-group-item">
+          <form method="post" action="{{ url_for('developer.logout_all') }}" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-link text-danger p-0"><i class="bi bi-box-arrow-right"></i> Logout All Users</button>
+          </form>
+          <small class="text-muted d-block ms-4">Force logout all active sessions</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Backups -->
+  <div class="col-md-6">
+    <div class="dashboard-section">
+      <h5><i class="bi bi-archive"></i> Recent Backups</h5>
+      {% if backups %}
+      <div class="list-group list-group-flush">
+        {% for name, path, mtime in backups %}
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ name }}</strong><br>
+            <small class="text-muted">{{ mtime.strftime('%Y-%m-%d %H:%M') }}</small>
+          </div>
+          <a href="{{ url_for('developer.backup_download', filename=name) }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-download"></i> Download
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-4">
+        <i class="bi bi-inbox" style="font-size: 3rem; color: #dee2e6;"></i>
+        <p class="text-muted mt-2">No backups yet</p>
+        <a href="{{ url_for('developer.backup_create') }}" class="btn btn-primary">
+          <i class="bi bi-plus-circle"></i> Create Backup
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
