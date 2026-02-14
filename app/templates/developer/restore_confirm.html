@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Restore database{% endblock %}
+{% block content %}
+<h2>Restore database</h2>
+<p class="text-danger">This will enable maintenance mode, log out all users, and replace the database with the selected backup. This action is destructive and logged.</p>
+<form method="post" action="{{ url_for('developer.backup_restore') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="mb-3">
+    <label class="form-label">Backup file (full path)</label>
+    <select name="backup_path" class="form-select" required>
+      <option value="">Select backup</option>
+      {% for name, path, mtime in backups %}<option value="{{ path }}">{{ name }} – {{ mtime.strftime('%Y-%m-%d %H:%M') }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="mb-3"><label class="form-label">Type RESTORE to confirm</label><input type="text" name="confirm" class="form-control" placeholder="RESTORE" required></div>
+  <div class="mb-3"><label class="form-label">Type RESTORE again</label><input type="text" name="confirm2" class="form-control" placeholder="RESTORE" required></div>
+  <button type="submit" class="btn btn-danger">Restore database</button>
+  <a href="{{ url_for('developer.backup_list') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
