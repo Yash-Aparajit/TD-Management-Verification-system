@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
+  <p class="text-muted mb-0">TD management and verification overview</p>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-diagram-3"></i> Lines</h6>
+        <h3 class="mb-0">{{ active_lines }} / {{ total_lines }}</h3>
+        <small class="text-muted">Active / Total</small>
+        <div class="mt-2">
+          <a href="{{ url_for('admin.lines_list') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-arrow-right"></i> Manage
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-boxes"></i> FG Codes</h6>
+        <h3 class="mb-0">{{ active_fg_codes }} / {{ total_fg_codes }}</h3>
+        <small class="text-muted">Active / Total</small>
+        <div class="mt-2">
+          <a href="{{ url_for('admin.fg_list') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-arrow-right"></i> Manage
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-list-check"></i> TD Items</h6>
+        <h3 class="mb-0">{{ active_td_items }} / {{ total_td_items }}</h3>
+        <small class="text-muted">Active / Total</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-subtitle mb-2 text-muted"><i class="bi bi-check-circle"></i> Verifications</h6>
+        <h3 class="mb-0">{{ total_verifications }}</h3>
+        <small class="text-muted">{{ today_verifications }} today</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Quick Actions -->
+  <div class="col-md-6">
+    <div class="dashboard-section">
+      <h5><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+      <div class="list-group list-group-flush">
+        <div class="list-group-item">
+          <a href="{{ url_for('admin.lines_list') }}"><i class="bi bi-diagram-3"></i> Manage Lines</a>
+          <small class="text-muted d-block ms-4">Create, edit, activate/deactivate lines</small>
+        </div>
+        <div class="list-group-item">
+          <a href="{{ url_for('admin.fg_list') }}"><i class="bi bi-boxes"></i> Manage FG Codes</a>
+          <small class="text-muted d-block ms-4">Create, edit, activate/deactivate FG codes</small>
+        </div>
+        <div class="list-group-item">
+          <a href="{{ url_for('admin.audit_logs') }}"><i class="bi bi-journal-text"></i> View Audit Logs</a>
+          <small class="text-muted d-block ms-4">Monitor system activity and user actions</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export & Reports -->
+  <div class="col-md-6">
+    <div class="dashboard-section">
+      <h5><i class="bi bi-file-earmark-spreadsheet"></i> Export & Reports</h5>
+      <div class="list-group list-group-flush">
+        <div class="list-group-item">
+          <a href="{{ url_for('admin.export_audit_logs') }}"><i class="bi bi-file-excel"></i> Export Audit Logs</a>
+          <small class="text-muted d-block ms-4">Download audit logs as Excel</small>
+        </div>
+        <div class="list-group-item">
+          <a href="{{ url_for('admin.export_verifications') }}"><i class="bi bi-file-excel"></i> Export Verifications</a>
+          <small class="text-muted d-block ms-4">Download verification records as Excel</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Verifications -->
+{% if recent_verifications %}
+<div class="dashboard-section">
+  <h5><i class="bi bi-clock-history"></i> Recent Verifications</h5>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>FG Code</th>
+          <th>Operator</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ver in recent_verifications %}
+        <tr>
+          <td>{{ ver.verified_at.strftime('%Y-%m-%d %H:%M') if ver.verified_at else '-' }}</td>
+          <td>{{ ver.fg_code.code if ver.fg_code else '-' }}</td>
+          <td>{{ ver.operator.username if ver.operator else '-' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
