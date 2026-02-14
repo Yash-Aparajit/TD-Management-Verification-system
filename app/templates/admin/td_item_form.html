@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if item else 'New' }} TD item{% endblock %}
+{% block content %}
+<h2>{{ 'Edit' if item else 'New' }} TD item – {{ fg.code }}</h2>
+<form method="post" action="{{ url_for('admin.td_edit', fg_id=fg.id, item_id=item.id) if item else url_for('admin.td_create', fg_id=fg.id) }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if item and item.updated_at %}<input type="hidden" name="updated_at" value="{{ item.updated_at.isoformat() }}">{% endif %}
+  <div class="mb-3"><label class="form-label">Item code</label><input type="text" name="item_code" class="form-control" value="{{ item.item_code if item else '' }}" required></div>
+  <div class="mb-3"><label class="form-label">Item name</label><input type="text" name="item_name" class="form-control" value="{{ item.item_name if item else '' }}"></div>
+  <div class="mb-3"><label class="form-label">Type</label><select name="item_type" class="form-select"><option value="child_part" {% if item and item.item_type=='child_part' %}selected{% endif %}>Child part</option><option value="consumable" {% if item and item.item_type=='consumable' %}selected{% endif %}>Consumable</option></select></div>
+  <div class="mb-3"><label class="form-label">Quantity</label><input type="number" name="quantity" class="form-control" step="0.01" min="0" value="{{ item.quantity if item is not none else '0' }}" required></div>
+  <div class="mb-3"><label class="form-label">Unit</label><input type="text" name="unit" class="form-control" value="{{ item.unit if item else 'PCS' }}"></div>
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="{{ url_for('admin.td_list', fg_id=fg.id) }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
