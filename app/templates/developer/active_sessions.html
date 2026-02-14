@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Active sessions{% endblock %}
+{% block content %}
+<h2>Active sessions</h2>
+<p>Approximate count of active sessions: <strong>{{ count }}</strong></p>
+<p>To log out all users, use <a href="{{ url_for('developer.dashboard') }}">Developer dashboard</a> → Logout all users.</p>
+{% endblock %}
