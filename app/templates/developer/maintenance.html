@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Maintenance mode{% endblock %}
+{% block content %}
+<h2>Maintenance mode</h2>
+<p>When enabled, only developers can access the system. All other users see a maintenance page.</p>
+<form method="post" action="{{ url_for('developer.maintenance_page') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% if enabled %}
+  <input type="hidden" name="enable" value="0"><button type="submit" class="btn btn-success">Disable maintenance mode</button>
+  {% else %}
+  <input type="hidden" name="enable" value="1"><button type="submit" class="btn btn-warning">Enable maintenance mode</button>
+  {% endif %}
+</form>
+{% endblock %}
