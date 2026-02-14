@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if fg else 'New' }} FG code{% endblock %}
+{% block content %}
+<h2>{{ 'Edit' if fg else 'New' }} FG code</h2>
+<form method="post" action="{{ url_for('admin.fg_edit', fg_id=fg.id) if fg else url_for('admin.fg_create') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="mb-3">
+    <label class="form-label">Line</label>
+    <select name="line_id" class="form-select" required {% if fg %}disabled{% endif %}>
+      {% for l in lines %}<option value="{{ l.id }}" {% if fg and fg.line_id == l.id %}selected{% endif %}>{{ l.code }} – {{ l.name }}</option>{% endfor %}
+    </select>
+    {% if fg %}<input type="hidden" name="line_id" value="{{ fg.line_id }}">{% endif %}
+  </div>
+  <div class="mb-3"><label class="form-label">FG code</label><input type="text" name="code" class="form-control" value="{{ fg.code if fg else '' }}" required></div>
+  <div class="mb-3"><label class="form-label">Name</label><input type="text" name="name" class="form-control" value="{{ fg.name if fg else '' }}"></div>
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="{{ url_for('admin.fg_list') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
