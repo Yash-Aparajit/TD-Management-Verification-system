@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Verification{% endblock %}
+{% block content %}
+<h2>Verification</h2>
+<p>Select a line, then an FG code to load the TD checklist and submit verification.</p>
+<ul>
+  {% for line in lines %}
+  <li><a href="{{ url_for('verification.fgs_for_line', line_id=line.id) }}">{{ line.code }} – {{ line.name }}</a></li>
+  {% else %}
+  <li class="text-muted">No lines available.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
