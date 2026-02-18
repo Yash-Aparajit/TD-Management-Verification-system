@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Select FG – {{ line.code }}{% endblock %}
+{% block content %}
+<h2>{{ line.code }} – {{ line.name }}</h2>
+<p>Select an FG code to verify.</p>
+<ul>
+  {% for fg in fgs %}
+  <li><a href="{{ url_for('verification.load_checklist', fg_id=fg.id) }}">{{ fg.code }}{% if fg.name %} – {{ fg.name }}{% endif %}</a></li>
+  {% else %}
+  <li class="text-muted">No FG codes for this line.</li>
+  {% endfor %}
+</ul>
+<p><a href="{{ url_for('verification.index') }}">Back to lines</a></p>
+{% endblock %}
