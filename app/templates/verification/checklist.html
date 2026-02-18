@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Checklist – {{ fg.code }}{% endblock %}
+{% block content %}
+<h2>Verification checklist – {{ fg.code }}</h2>
+<p class="text-muted">{{ fg.line.code if fg.line else '' }} – {{ fg.name or fg.code }}</p>
+<p><strong>Submit once; the record cannot be changed after submission.</strong></p>
+<form method="post" action="{{ url_for('verification.submit_checklist', fg_id=fg.id) }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <table class="table table-bordered">
+    <thead><tr><th>Item code</th><th>Item name</th><th>Type</th><th>Expected qty</th><th>Unit</th><th>Actual qty</th></tr></thead>
+    <tbody>
+    {% for it in items %}
+      <tr>
+        <td>{{ it.item_code }}</td>
+        <td>{{ it.item_name }}</td>
+        <td>{{ it.item_type }}</td>
+        <td>{{ it.quantity }}</td>
+        <td>{{ it.unit }}</td>
+        <td><input type="number" name="actual_{{ it.id }}" value="{{ it.quantity }}" step="0.01" min="0" class="form-control form-control-sm" style="width:100px"></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="mb-3"><label class="form-label">Notes (optional)</label><textarea name="notes" class="form-control" rows="2" maxlength="2000"></textarea></div>
+  <button type="submit" class="btn btn-primary">Submit verification</button>
+  <a href="{{ url_for('verification.fgs_for_line', line_id=fg.line_id) }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
